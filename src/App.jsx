@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, push, set, onValue } from 'firebase/database';
+import { getDatabase, ref, push, set, onValue, off } from 'firebase/database';
 
 
 import firebase from 'firebase/compat/app';  // Importa firebase de esta manera para evitar conflictos de versión
@@ -9,15 +9,15 @@ import firebase from 'firebase/compat/app';  // Importa firebase de esta manera 
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAccmkKZAm1BKE-tZUakZIytVuM7Z2DaJk",
-  authDomain: "pulsador-f1c0f.firebaseapp.com",
-  projectId: "pulsador-f1c0f",
-  storageBucket: "pulsador-f1c0f.appspot.com",
-  messagingSenderId: "882749688746",
-  appId: "1:882749688746:web:b161ab1b223e029b1839d3",
-  databaseURL: 'https://pulsador-f1c0f-default-rtdb.europe-west1.firebasedatabase.app//'
-
+  apiKey: import.meta.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: import.meta.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.REACT_APP_FIREBASE_APP_ID,
+  databaseURL: "https://pulsador-f1c0f-default-rtdb.europe-west1.firebasedatabase.app"
 };
+
 
 const app = initializeApp(firebaseConfig);  // Inicializa la aplicación Firebase
 function App() {
@@ -32,6 +32,7 @@ function App() {
 
 
   useEffect(() => {
+    
     const usuariosRef = ref(getDatabase(app), 'usuarios');
     onValue(usuariosRef, (snapshot) => {
       const usuariosData = snapshot.val();
@@ -40,6 +41,35 @@ function App() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    const ganadoresRef = ref(getDatabase(app), 'ganadores');
+
+    // Función que se ejecuta cada vez que hay un cambio en la base de datos 'ganadores'
+    const handleGanadoresChange = (snapshot) => {
+      const ganadoresData = snapshot.val();
+      if (ganadoresData) {
+        const ganadoresArray = Object.values(ganadoresData);
+        
+        // Realiza la lógica de reinicio si la matriz de ganadores es mayor a 0
+        if (ganadoresArray.length > 0) {
+          iniciarCuentaAtras();
+
+          // También puedes reiniciar el estado o ejecutar otras acciones necesarias
+          setGanadores(ganadoresArray);
+        }
+      }
+    };
+
+    // Establece la escucha continua en la base de datos 'ganadores'
+    const ganadoresListener = onValue(ganadoresRef, handleGanadoresChange);
+
+    // Devuelve una función de limpieza para detener la escucha cuando el componente se desmonta
+    return () => {
+      off(ganadoresRef, 'value', ganadoresListener);
+    };
+  }, []); // El array de dependencias está vacío, por lo que este useEffect se ejecuta solo una vez
+
 
   const ganadoresRef = ref(getDatabase(app), 'ganadores');
 
