@@ -28,6 +28,8 @@ function App() {
   const [nombreBienvenida, setNombreBienvenida] = useState('');
   const [ganadores, setGanadores] = useState([]);
   const [ganador, setGanador] = useState('');
+  const [tiempoDeEspera, setTiempoDeEspera] = useState(false);
+
 
 
 
@@ -44,31 +46,24 @@ function App() {
 
   useEffect(() => {
     const ganadoresRef = ref(getDatabase(app), 'ganadores');
-
+  
     // Función que se ejecuta cada vez que hay un cambio en la base de datos 'ganadores'
     const handleGanadoresChange = (snapshot) => {
       const ganadoresData = snapshot.val();
-      if (ganadoresData) {
-        const ganadoresArray = Object.values(ganadoresData);
-        
-        // Realiza la lógica de reinicio si la matriz de ganadores es mayor a 0
-        if (ganadoresArray.length > 0) {
-          iniciarCuentaAtras();
-
-          // También puedes reiniciar el estado o ejecutar otras acciones necesarias
-          setGanadores(ganadoresArray);
-        }
-      }
+      const ganadoresArray = ganadoresData ? Object.values(ganadoresData) : [];
+  
+      // Actualiza el estado local independientemente de si ganadoresData está vacío o no
+      setGanadores(ganadoresArray);
     };
-
+  
     // Establece la escucha continua en la base de datos 'ganadores'
     const ganadoresListener = onValue(ganadoresRef, handleGanadoresChange);
-
+  
     // Devuelve una función de limpieza para detener la escucha cuando el componente se desmonta
     return () => {
       off(ganadoresRef, 'value', ganadoresListener);
     };
-  }, []); // El array de dependencias está vacío, por lo que este useEffect se ejecuta solo una vez
+  }, []);// El array de dependencias está vacío, por lo que este useEffect se ejecuta solo una vez
 
 
   const ganadoresRef = ref(getDatabase(app), 'ganadores');
@@ -85,38 +80,32 @@ function App() {
   };
 
   const detectarUsuario = () => {
-    if (!botonDesactivado) {
-      setBotonDesactivado(true);
+    // Desactiva el botón y configura el tiempo de espera
+    setBotonDesactivado(true);
+    setTiempoDeEspera(true);
 
-      // Agrega el nombre del usuario a la base de datos de ganadores
-      const nuevoGanadorRef = push(ganadoresRef);
-      set(nuevoGanadorRef, nombreBienvenida);
+    // Agrega el nombre del usuario a la base de datos de ganadores
+    const nuevoGanadorRef = push(ganadoresRef);
+    set(nuevoGanadorRef, nombreBienvenida);
 
-      // Verifica si hay un solo ganador
-      onValue(ganadoresRef, (snapshot) => {
-        const ganadoresData = snapshot.val();
-        if (ganadoresData) {
-          setGanadores(Object.values(ganadoresData));
-          if (Object.keys(ganadoresData).length === 1) {
-            setGanador(nombreBienvenida);
-            iniciarCuentaAtras();
-          }
-        }
-      });
-    }
+    // Después de 3 segundos, restablece el estado
+    setTimeout(() => {
+      setBotonDesactivado(false);
+      setTiempoDeEspera(false);
+    }, 3000);
   };
 
+
   
-  const iniciarCuentaAtras = () => {
+  const borrarGanadores = () => {
     
     // Después de 10 segundos, limpia la base de datos de ganadores y habilita el botón de nuevo
-    setTimeout(() => {
-      
-      setBotonDesactivado(false);
+    
        // Asegúrate de reiniciar a 10 después de limpiar el intervalo
       const ganadoresRef = ref(getDatabase(app), 'ganadores');
       set(ganadoresRef, null);
-    }, 10000);
+      setGanadores([])
+   
   };
   const reiniciarJuego = () => {
     const usuariosRef = ref(getDatabase(app), 'usuarios');
@@ -137,7 +126,7 @@ function App() {
       <h2>Detección de Usuarios</h2>
       <div>
       {(nombreBienvenida === "Puyod" || nombreBienvenida === "admin") ? (
-  <button onClick={reiniciarJuego}>Reiniciar Juego</button>
+  <div><button onClick={reiniciarJuego}>Reiniciar Juego</button><button onClick={borrarGanadores}>Borrar Ganadores</button></div>
 ) : null}      </div>
       <div>
         <p>Usuarios Actuales:</p>
@@ -150,9 +139,15 @@ function App() {
       {mostrarBienvenida && (
         <div>
           <p>Bienvenido, {nombreBienvenida}!</p>
-          <button onClick={detectarUsuario} disabled={botonDesactivado}>
+          <button onClick={detectarUsuario} disabled={ganadores.length > 2 || tiempoDeEspera} >
             Pulsar
           </button>
+          <p>Ganadores:</p>
+        <ol>
+          {ganadores.map((ganador, index) => (
+            <li key={index}>{ganador}</li>
+          ))}
+        </ol>
         </div>
       )}
       {!mostrarBienvenida && (
@@ -167,20 +162,7 @@ function App() {
         </div>
       )}
      
-      {botonDesactivado && (
-        <div>
-        <p>Ganadores:</p>
-        <ul>
-          {ganadores.map((ganador, index) => (
-            <li key={index}>{ganador}</li>
-          ))}
-        </ul>
       
-       
-          <p>{ganador} ha ganado</p>
-
-        </div>
-      )}
     </div>
   );
 }
