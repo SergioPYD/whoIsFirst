@@ -6,7 +6,7 @@ import Juego from "./pages/Juego";
 
 function App() {
   return (
-    <div className=" max-w-full max-h-full" >
+    <div className="git pr-6 flex justify-center pt-10" style={{ height:"100vh"}} >
 
     <Routes>
       <Route path="/" element={<Home />} />
