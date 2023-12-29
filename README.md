@@ -1,8 +1,11 @@
-# React + Vite
+# ¿Quién fue Primero?
+Perfecto para reunirte con amigos, realizar pruebas tipo concurso y utilizar la página para ver quién es el primero en contestar la pregunta.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+Te permite jugar online y competir para quien es el primero en pulsar el botón gracias a la base de datos creada en Firebase.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+Aplicación sencilla enfocada a moviles creada con React , TailwindCSS y FireBase.
+
+
+

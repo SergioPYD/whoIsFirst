@@ -206,32 +206,21 @@ function App() {
        
         <ul></ul>
       </div>
-      {mostrarBienvenida && (
-        <div className="flex flex-col gap-3 items-center">
-          <p className="text-2xl">¡Bienvenido {nombreBienvenida}!</p>
-          <Button
+      {params.role !== "admin" && mostrarBienvenida && 
+    <div className="flex flex-col gap-3 items-center">
+        <p className="text-2xl">¡Bienvenido {nombreBienvenida}!</p>
+        <Button
             onClick={detectarUsuario}
             disabled={ganadores.length > 2 || tiempoDeEspera}
             className="redondo text-3xl"
             color="danger"
-            
-          >
-           
+        >
             Pulsar
-          </Button>
-          {ganadores.length>0 &&<div className="text-2xl">
-          <p>Ganadores</p>
-          <ol>
-            {ganadores.map((ganador, index) => (
-              <li key={index}><b>{index+1}º</b> {ganador}</li>
-            ))}
-          </ol>
-
-          </div>}
-          
-        </div>
-      )}
-      {!mostrarBienvenida && (
+        </Button>
+    </div>
+}
+       
+      {params.role !== "admin" && !mostrarBienvenida && (
         <div className="flex gap-2 text-white flex-col">
           <Input
             type="text"
@@ -252,6 +241,15 @@ function App() {
           </Button>
         </div>
       )}
+      {ganadores.length>0 &&<div className="text-2xl">
+          <p>Ganadores</p>
+          <ol>
+            {ganadores.map((ganador, index) => (
+              <li key={index}><b>{index+1}º</b> {ganador}</li>
+            ))}
+          </ol>
+
+          </div>}
     </div>
   );
 }

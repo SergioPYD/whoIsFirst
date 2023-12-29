@@ -15,6 +15,7 @@ export default function Home() {
       
         <Button className="bg-gradient-to-tr from-green-500 to-blue-500 text-white shadow-lg" variant="full" style={{width:"380px", height:"150px", fontSize:"2rem"}} as={Link} onClick={() => navigate("/game/concursante")} color="success">CONCURSANTE</Button>
 
+      <h2 className="text-center text-xl mt-60	"> Creado por Sergio Puyod</h2>
       </div>
      
     </>
